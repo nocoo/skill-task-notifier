@@ -1,0 +1,7 @@
+{
+  "bark_server": "https://api.day.app",
+  "bark_key": "",
+  "bark_group": "Claude Code",
+  "sound_enabled": true,
+  "system_notify_enabled": true
+}
