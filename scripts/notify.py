@@ -94,13 +94,20 @@ def send_bark_notification(config, level, message):
 
     level_config = BARK_CONFIG.get(level, BARK_CONFIG["info"])
 
-    # Build URL parameters (use custom group from config, default to "Claude Code")
+    # Get icon URL from config (with fallback to default icons)
+    icon_config = config.get("icons", {})
+    icon_url = icon_config.get(level, icon_config.get("info", level_config["icon"]))
+
+    # Build URL parameters
     params = {
         "group": config.get("bark_group", "Claude Code"),
-        "icon": level_config["icon"],
         "sound": level_config["sound"],
         "level": level.lower()
     }
+
+    # Add icon if available
+    if icon_url:
+        params["icon"] = icon_url
 
     # Construct URL
     url = f"{bark_server}/{bark_key}/{urllib.parse.quote(message)}"

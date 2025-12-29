@@ -108,6 +108,11 @@ class TestBarkNotification(unittest.TestCase):
             "bark_server": "https://api.day.app",
             "bark_key": "test_key_123",
             "bark_group": "TestGroup",
+            "icons": {
+                "success": "https://example.com/success.png",
+                "error": "https://example.com/error.png",
+                "info": "https://example.com/info.png"
+            },
             "sound_enabled": True,
             "system_notify_enabled": True
         }
@@ -132,6 +137,73 @@ class TestBarkNotification(unittest.TestCase):
         self.assertIn("test_key_123", url)
         self.assertIn("Test%20message", url)
         self.assertIn("group=TestGroup", url)
+        self.assertIn("icon=https%3A%2F%2Fexample.com%2Fsuccess.png", url)
+
+    @patch('notify.urllib.request.urlopen')
+    @patch('builtins.print')
+    def test_send_bark_notification_custom_icons(self, mock_print, mock_urlopen):
+        """Test Bark notification with custom icons."""
+        mock_response = MagicMock()
+        mock_response.status = 200
+        mock_response.read.return_value = b'{"code": 200, "message": "success"}'
+        mock_urlopen.return_value.__enter__.return_value = mock_response
+
+        result = notify.send_bark_notification(self.config, "error", "Error message")
+
+        self.assertTrue(result)
+        call_args = mock_urlopen.call_args
+        request = call_args[0][0]
+        url = request.full_url
+        self.assertIn("icon=https%3A%2F%2Fexample.com%2Ferror.png", url)
+
+    @patch('notify.urllib.request.urlopen')
+    @patch('builtins.print')
+    def test_send_bark_notification_icon_fallback(self, mock_print, mock_urlopen):
+        """Test Bark notification with icon fallback to info."""
+        mock_response = MagicMock()
+        mock_response.status = 200
+        mock_response.read.return_value = b'{"code": 200, "message": "success"}'
+        mock_urlopen.return_value.__enter__.return_value = mock_response
+
+        config_no_icon = {
+            "bark_server": "https://api.day.app",
+            "bark_key": "test_key_123",
+            "icons": {
+                "info": "https://example.com/info.png"
+            }
+        }
+
+        result = notify.send_bark_notification(config_no_icon, "success", "Test message")
+
+        self.assertTrue(result)
+        call_args = mock_urlopen.call_args
+        request = call_args[0][0]
+        url = request.full_url
+        # Should fallback to info icon
+        self.assertIn("icon=https%3A%2F%2Fexample.com%2Finfo.png", url)
+
+    @patch('notify.urllib.request.urlopen')
+    @patch('builtins.print')
+    def test_send_bark_notification_no_icons(self, mock_print, mock_urlopen):
+        """Test Bark notification without icons config."""
+        mock_response = MagicMock()
+        mock_response.status = 200
+        mock_response.read.return_value = b'{"code": 200, "message": "success"}'
+        mock_urlopen.return_value.__enter__.return_value = mock_response
+
+        config_no_icons = {
+            "bark_server": "https://api.day.app",
+            "bark_key": "test_key_123"
+        }
+
+        result = notify.send_bark_notification(config_no_icons, "success", "Test message")
+
+        self.assertTrue(result)
+        # Should still work, just without custom icon (using default from BARK_CONFIG)
+        call_args = mock_urlopen.call_args
+        request = call_args[0][0]
+        url = request.full_url
+        self.assertIn("test_key_123", url)
 
     @patch('notify.urllib.request.urlopen')
     @patch('builtins.print')
