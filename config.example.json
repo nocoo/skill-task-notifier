@@ -2,9 +2,9 @@
   "bark_server": "https://api.day.app",
   "bark_key": "",
   "icons": {
-    "success": "https://img.icons8.com/emoji/96/check-mark-button-emoji.png",
-    "error": "https://img.icons8.com/emoji/96/cross-mark-emoji.png",
-    "info": "https://img.icons8.com/emoji/96/bell-emoji.png"
+    "success": "https://img.icons8.com/color/96/verified-account.png",
+    "error": "https://img.icons8.com/color/96/high-priority.png",
+    "info": "https://img.icons8.com/color/96/command-line.png"
   },
   "sound_enabled": true,
   "system_notify_enabled": true
