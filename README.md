@@ -4,7 +4,7 @@
 
 [![Skill](https://img.shields.io/badge/Claude_Code-Skill-blue)](https://claude.com/claude-code)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-47%20Passed-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/Tests-50%20Passed-brightgreen)](#testing)
 
 ---
 
@@ -33,6 +33,10 @@
 ## 📋 Prerequisites
 
 - **Python 3.6+** (pre-installed on macOS/Linux)
+- **gum** (for interactive installation)
+  ```bash
+  brew install gum
+  ```
 - **Bark App** (iOS push, optional but recommended)
   - Download: [App Store](https://apps.apple.com/cn/app/bark-customed-notifications/id1403750366)
   - GitHub: [Finb/Bark](https://github.com/Finb/Bark)
@@ -75,10 +79,12 @@ cp config.example.json config.json
 ./install.sh
 ```
 
-The installer will automatically:
+The interactive installer (powered by **gum**) will:
 - Create `~/.claude/skills/task-notifier/` directory
-- Create symbolic links to skill files
+- Copy all skill files (not symlinks - more reliable)
 - Set executable permissions
+- Prompt for Bark key configuration
+- Optionally send a test notification
 - Verify installation integrity
 
 ## 📖 Usage
@@ -198,7 +204,7 @@ coverage html
 
 | Metric | Value |
 |--------|-------|
-| **Tests** | 47 |
+| **Tests** | 50 |
 | **Pass Rate** | 100% |
 | **Code Coverage** | 90% |
 | **Lines** | ~200 |
