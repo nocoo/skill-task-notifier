@@ -1,3 +1,8 @@
+---
+name: task-notifier
+description: Multi-channel notification tool (Bark/System/Sound) with zero dependencies
+---
+
 # TaskNotifier
 
 ## Description
@@ -64,11 +69,11 @@ python3 scripts/notify.py error "Deployment failed: timeout waiting for response
 
 ## Configuration
 
-The Skill reads `scripts/config.json`. Ensure it exists before use:
+The Skill reads `config.json` in the skill root directory. Ensure it exists before use:
 
 ```bash
-cp config.example.json scripts/config.json
-# Then edit scripts/config.json and add your bark_key
+cp config.example.json config.json
+# Then edit config.json and add your bark_key
 ```
 
 ## Implementation Notes

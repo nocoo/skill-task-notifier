@@ -52,10 +52,10 @@ cd skill-task-notifier
 2. Create configuration file:
 
 ```bash
-cp config.example.json scripts/config.json
+cp config.example.json config.json
 ```
 
-3. Edit `scripts/config.json` and add your Bark Key:
+3. Edit `config.json` in the skill root and add your Bark Key:
 
 ```json
 {
@@ -140,11 +140,13 @@ skill-task-notifier/
 ├── install.sh              # Installation script
 ├── README.md               # This file (English)
 ├── README.zh-CN.md         # Chinese version
+├── requirements.txt        # Zero dependency declaration
 ├── run_tests.sh            # Test runner script
 ├── SKILL.md                # Skill definition (used by Claude)
+├── config.json             # Your configuration (not in git)
 └── scripts/
     ├── notify.py           # Core notification logic (zero-dep Python)
-    └── config.json         # Your configuration (not in git)
+    └── run.py              # Unified entry point (for consistency)
 ```
 
 ## 🔧 How It Works
@@ -160,7 +162,7 @@ skill-task-notifier/
 │  TaskNotifier Skill                     │
 │  ──────────────────────────────────     │
 │  ┌─────────────────────────────────┐   │
-│  │  1. Read config.json            │   │
+│  │  1. Read config.json (root)     │   │
 │  │  2. Determine level             │   │
 │  │  3. Send Bark Push (iOS)        │   │
 │  │  4. Show System Notification    │   │
@@ -215,7 +217,7 @@ coverage html
 
 ### No notifications received?
 
-1. **Check Bark Key**: Verify `bark_key` is correctly set in `scripts/config.json`
+1. **Check Bark Key**: Verify `bark_key` is correctly set in `config.json` (skill root)
 2. **Check Sound**: Ensure system volume is up on macOS
 3. **Check Permissions**: Ensure `notify.py` has execute permission (`chmod +x scripts/notify.py`)
 

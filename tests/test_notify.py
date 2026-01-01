@@ -25,11 +25,12 @@ class TestConfigPath(unittest.TestCase):
     """Test configuration path detection."""
 
     def test_get_config_path(self):
-        """Test that config path is correctly resolved."""
+        """Test that config path is correctly resolved (in skill root)."""
         result = notify.get_config_path()
         self.assertIsInstance(result, Path)
         self.assertTrue(result.name == "config.json")
-        self.assertIn("scripts", str(result))
+        # Config should be in skill root (parent of scripts/ directory)
+        self.assertNotIn("scripts", str(result))
 
 
 class TestLoadConfig(unittest.TestCase):

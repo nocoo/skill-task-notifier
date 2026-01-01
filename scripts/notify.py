@@ -51,9 +51,10 @@ SOUND_MAP = {
 # =============================================================================
 
 def get_config_path():
-    """Get the path to config.json in the same directory as this script."""
-    script_dir = Path(__file__).parent.resolve()
-    return script_dir / "config.json"
+    """Get the path to config.json in the skill root directory."""
+    # Skill root is the parent of scripts/ directory
+    skill_root = Path(__file__).parent.parent.resolve()
+    return skill_root / "config.json"
 
 
 def load_config():

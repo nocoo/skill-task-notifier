@@ -1,0 +1,6 @@
+# TaskNotifier - Zero Dependency Design
+# This skill uses only Python standard library
+# No external packages required
+
+# Leave empty to explicitly indicate zero dependencies
+# Python 3.6+ required (pre-installed on macOS/Linux)
