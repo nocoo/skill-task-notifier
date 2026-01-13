@@ -51,21 +51,23 @@ Ambiguous/Status Update        → Use 'info'
 ## Command Examples
 
 ```bash
-# Success - Task completed successfully
-python3 scripts/notify.py success "Build completed in 2m 15s"
+# Simple usage - message only (defaults to success level)
+python3 scripts/notify.py "Build completed in 2m 15s"
 
-# Error - Task failed
-python3 scripts/notify.py error "Build failed: dependency not found"
+# Error level - Task failed
+python3 scripts/notify.py "Build failed: dependency not found" error
 
-# Info - General status update
-python3 scripts/notify.py info "Running tests... (15 test suites)"
+# Info level - General status update
+python3 scripts/notify.py "Running tests... (15 test suites)" info
 
 # Success - With detailed context
-python3 scripts/notify.py success "Tests passed: 127 passed, 0 failed"
+python3 scripts/notify.py "Tests passed: 127 passed, 0 failed"
 
 # Error - With command output
-python3 scripts/notify.py error "Deployment failed: timeout waiting for response"
+python3 scripts/notify.py "Deployment failed: timeout waiting for response" error
 ```
+
+**Recommended**: Use the simplified syntax without specifying level (defaults to `success`). Only specify level when needed (`error` or `info`).
 
 ## Configuration
 

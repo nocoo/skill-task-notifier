@@ -302,12 +302,23 @@ def _play_linux_sound(level):
     # Try paplay (PulseAudio) first, then aplay (ALSA)
     commands = ["paplay", "aplay"]
 
-    # Sound files (standard system sounds)
-    sound_files = [
-        "/usr/share/sounds/freedesktop/stereo/complete.oga",
-        "/usr/share/sounds/freedesktop/stereo/message.oga",
-        "/usr/share/sounds/freedesktop/stereo/dialog-information.oga"
-    ]
+    # Sound files per level (standard freedesktop sounds)
+    level_sounds = {
+        "success": [
+            "/usr/share/sounds/freedesktop/stereo/complete.oga",
+            "/usr/share/sounds/freedesktop/stereo/success.oga"
+        ],
+        "error": [
+            "/usr/share/sounds/freedesktop/stereo/suspend-error.oga",
+            "/usr/share/sounds/freedesktop/stereo/dialog-error.oga"
+        ],
+        "info": [
+            "/usr/share/sounds/freedesktop/stereo/message.oga",
+            "/usr/share/sounds/freedesktop/stereo/dialog-information.oga"
+        ]
+    }
+
+    sound_files = level_sounds.get(level, level_sounds["success"])
 
     for cmd in commands:
         for sound_file in sound_files:
@@ -366,20 +377,22 @@ def _play_windows_sound(level):
 
 def main():
     """Main entry point."""
-    if len(sys.argv) != 3:
-        print(f"Usage: python3 {os.path.basename(__file__)} <level> <message>", file=sys.stderr)
+    # New syntax: notify.py <message> [level]
+    # Default level is 'success'
+    if len(sys.argv) < 2:
+        print(f"Usage: python3 {os.path.basename(__file__)} <message> [level]", file=sys.stderr)
         print("", file=sys.stderr)
-        print("  level:   success | error | info", file=sys.stderr)
         print("  message: Notification message (use quotes for spaces)", file=sys.stderr)
+        print("  level:   Optional. success | error | info (default: success)", file=sys.stderr)
         print("", file=sys.stderr)
         print("Examples:", file=sys.stderr)
-        print(f"  python3 {os.path.basename(__file__)} success \"Build completed!\"", file=sys.stderr)
-        print(f"  python3 {os.path.basename(__file__)} error \"Tests failed!\"", file=sys.stderr)
-        print(f"  python3 {os.path.basename(__file__)} info \"Task in progress...\"", file=sys.stderr)
+        print(f"  python3 {os.path.basename(__file__)} \"Build completed!\"", file=sys.stderr)
+        print(f"  python3 {os.path.basename(__file__)} \"Tests failed!\" error", file=sys.stderr)
+        print(f"  python3 {os.path.basename(__file__)} \"Task in progress...\" info", file=sys.stderr)
         sys.exit(1)
 
-    level = sys.argv[1].lower()
-    message = sys.argv[2]
+    message = sys.argv[1]
+    level = sys.argv[2].lower() if len(sys.argv) > 2 else "success"
 
     # Validate level
     if level not in BARK_CONFIG:
