@@ -5,6 +5,8 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -21,3 +23,25 @@ jobs:
         run: ruff format --check .
       - name: Test
         run: pytest tests/ -v --cov=scripts --cov-report=term-missing --cov-fail-under=90
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        with:
+          args: --config .gitleaks.toml
+        env:
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  osv-scanner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google/osv-scanner-action/osv-scanner-action@v2
+        with:
+          config: osv-scanner.toml
+          scan-args: |-
+            --lockfile=requirements.txt

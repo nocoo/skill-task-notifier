@@ -249,6 +249,11 @@ sudo pacman -S libnotify
 
 ## 🤝 Contributing
 
+```bash
+# Set up git hooks (required before committing)
+make setup
+```
+
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
