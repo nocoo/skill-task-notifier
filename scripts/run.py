@@ -4,8 +4,8 @@ Universal runner for task-notifier scripts
 Ensures consistent invocation pattern (even with zero dependencies)
 """
 
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -21,12 +21,12 @@ def main():
     script_args = sys.argv[2:]
 
     # Handle both "scripts/script.py" and "script.py" formats
-    if script_name.startswith('scripts/'):
+    if script_name.startswith("scripts/"):
         script_name = script_name[8:]  # Remove 'scripts/' prefix
 
     # Ensure .py extension
-    if not script_name.endswith('.py'):
-        script_name += '.py'
+    if not script_name.endswith(".py"):
+        script_name += ".py"
 
     # Get script path (scripts/ is relative to this run.py file)
     script_path = Path(__file__).parent / script_name
@@ -38,7 +38,7 @@ def main():
         sys.exit(1)
 
     # Execute the script (no venv needed - zero dependency design)
-    cmd = [sys.executable, str(script_path)] + script_args
+    cmd = [sys.executable, str(script_path), *script_args]
 
     try:
         result = subprocess.run(cmd)

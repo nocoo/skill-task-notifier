@@ -1,0 +1,41 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "A",    # flake8-builtins
+    "S",    # flake8-bandit (security)
+    "T20",  # flake8-print
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "RUF",  # ruff-specific rules
+]
+ignore = [
+    "T201",   # allow print() — this is a CLI notification tool
+    "S603",   # allow subprocess calls without shell=True validation — needed for OS notifications
+    "S607",   # allow starting process with partial executable path
+    "S605",   # allow starting process with shell
+    "S310",   # allow urllib.request.urlopen — needed for Bark API calls
+    "RUF001", # allow ambiguous unicode chars — intentional emoji usage (ℹ️)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",  # allow assert in tests
+    "S106",  # allow hardcoded passwords in tests (test fixtures)
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=scripts --cov-report=term-missing --cov-fail-under=90"
