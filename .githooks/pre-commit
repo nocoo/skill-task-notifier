@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Pre-commit hook: lint + test gate
-# Install: git config core.hooksPath .githooks
+# Activate: git config core.hooksPath .githooks (or run: make setup)
 set -euo pipefail
 
 echo "🔍 Running pre-commit checks..."
