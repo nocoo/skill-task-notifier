@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Pre-commit hook: lint + test gate
+# Install: git config core.hooksPath .githooks
+set -euo pipefail
+
+echo "🔍 Running pre-commit checks..."
+
+# Lint
+echo "  → ruff check"
+python3 -m ruff check .
+
+# Format check
+echo "  → ruff format --check"
+python3 -m ruff format --check .
+
+# Tests with coverage
+echo "  → pytest"
+python3 -m pytest tests/ -v --cov=scripts --cov-report=term-missing --cov-fail-under=90
+
+echo "✅ All pre-commit checks passed"
