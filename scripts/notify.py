@@ -4,16 +4,15 @@ Task Notifier - Multi-channel notification script
 Zero dependency: Uses only Python standard library
 """
 
-import sys
-import os
 import json
+import os
 import platform
 import subprocess
-import urllib.request
-import urllib.parse
+import sys
 import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
-
 
 # =============================================================================
 # Constants
@@ -24,31 +23,20 @@ BARK_CONFIG = {
     "success": {
         "group": "Claude_Success",
         "icon": "https://via.placeholder.com/80/4CAF50/FFFFFF?text=✓",
-        "sound": "bell"
+        "sound": "bell",
     },
-    "error": {
-        "group": "Claude_Error",
-        "icon": "https://via.placeholder.com/80/F44336/FFFFFF?text=✕",
-        "sound": "alarm"
-    },
-    "info": {
-        "group": "Claude_Info",
-        "icon": "https://via.placeholder.com/80/2196F3/FFFFFF?text=i",
-        "sound": "bell"
-    }
+    "error": {"group": "Claude_Error", "icon": "https://via.placeholder.com/80/F44336/FFFFFF?text=✕", "sound": "alarm"},
+    "info": {"group": "Claude_Info", "icon": "https://via.placeholder.com/80/2196F3/FFFFFF?text=i", "sound": "bell"},
 }
 
 # Sound files per level (macOS system sounds)
-SOUND_MAP = {
-    "success": "Glass",
-    "error": "Basso",
-    "info": "Ping"
-}
+SOUND_MAP = {"success": "Glass", "error": "Basso", "info": "Ping"}
 
 
 # =============================================================================
 # Configuration
 # =============================================================================
+
 
 def get_config_path():
     """Get the path to config.json in the skill root directory."""
@@ -64,13 +52,13 @@ def load_config():
     if not config_path.exists():
         example_path = config_path.parent / "config.example.json"
         print(f"[ERROR] Config file not found: {config_path}", file=sys.stderr)
-        print(f"[INFO]  Please copy the example config:", file=sys.stderr)
+        print("[INFO]  Please copy the example config:", file=sys.stderr)
         print(f"        cp {example_path} {config_path}", file=sys.stderr)
-        print(f"[INFO]  Then edit config.json and fill in your bark_key", file=sys.stderr)
+        print("[INFO]  Then edit config.json and fill in your bark_key", file=sys.stderr)
         sys.exit(1)
 
     try:
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             return json.load(f)
     except json.JSONDecodeError as e:
         print(f"[ERROR] Invalid JSON in config.json: {e}", file=sys.stderr)
@@ -83,6 +71,7 @@ def load_config():
 # =============================================================================
 # Bark Notification
 # =============================================================================
+
 
 def send_bark_notification(config, level, message):
     """Send push notification via Bark."""
@@ -100,11 +89,7 @@ def send_bark_notification(config, level, message):
     icon_url = icon_config.get(level, icon_config.get("info", level_config["icon"]))
 
     # Build URL parameters
-    params = {
-        "group": config.get("bark_group", "Claude Code"),
-        "sound": level_config["sound"],
-        "level": level.lower()
-    }
+    params = {"group": config.get("bark_group", "Claude Code"), "sound": level_config["sound"], "level": level.lower()}
 
     # Add icon if available
     if icon_url:
@@ -116,11 +101,7 @@ def send_bark_notification(config, level, message):
     full_url = f"{url}?{query_string}"
 
     try:
-        req = urllib.request.Request(
-            full_url,
-            method="GET",
-            headers={"User-Agent": "Claude-Task-Notifier/1.0"}
-        )
+        req = urllib.request.Request(full_url, method="GET", headers={"User-Agent": "Claude-Task-Notifier/1.0"})
         with urllib.request.urlopen(req, timeout=10) as response:
             if response.status == 200:
                 data = json.loads(response.read().decode("utf-8"))
@@ -145,15 +126,12 @@ def send_bark_notification(config, level, message):
 # System Notification
 # =============================================================================
 
+
 def send_system_notification(level, message):
     """Send desktop notification based on OS."""
     system = platform.system()
 
-    title_map = {
-        "success": "✅ Task Completed",
-        "error": "❌ Task Failed",
-        "info": "ℹ️ Task Notification"
-    }
+    title_map = {"success": "✅ Task Completed", "error": "❌ Task Failed", "info": "ℹ️ Task Notification"}
     title = title_map.get(level, "Task Notification")
 
     if system == "Darwin":  # macOS
@@ -171,13 +149,8 @@ def _send_macos_notification(title, message):
     """Send notification on macOS using osascript."""
     script = f'display notification "{message}" with title "{title}"'
     try:
-        subprocess.run(
-            ["osascript", "-e", script],
-            check=True,
-            capture_output=True,
-            timeout=5
-        )
-        print(f"[OK]    System notification sent (macOS)")
+        subprocess.run(["osascript", "-e", script], check=True, capture_output=True, timeout=5)
+        print("[OK]    System notification sent (macOS)")
         return True
     except subprocess.CalledProcessError as e:
         print(f"[WARN]  macOS notification failed: {e.stderr.decode().strip()}", file=sys.stderr)
@@ -190,13 +163,8 @@ def _send_macos_notification(title, message):
 def _send_linux_notification(title, message):
     """Send notification on Linux using notify-send."""
     try:
-        subprocess.run(
-            ["notify-send", title, message],
-            check=True,
-            capture_output=True,
-            timeout=5
-        )
-        print(f"[OK]    System notification sent (Linux)")
+        subprocess.run(["notify-send", title, message], check=True, capture_output=True, timeout=5)
+        print("[OK]    System notification sent (Linux)")
         return True
     except FileNotFoundError:
         print("[WARN]  notify-send not found. Install: sudo apt install libnotify-bin", file=sys.stderr)
@@ -211,12 +179,14 @@ def _send_linux_notification(title, message):
 
 def _send_windows_notification(title, message):
     """Send notification on Windows using PowerShell BurntToast."""
-    ps_script = f'''
+    toast_mgr = "Windows.UI.Notifications.ToastNotificationManager"
+    xml_dom = "Windows.Data.Xml.Dom"
+    ps_script = f"""
     Add-Type -AssemblyName Windows.UI.Notifications
-    Add-Type -AssemblyName Windows.Data.Xml.Dom
+    Add-Type -AssemblyName {xml_dom}
 
-    [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
-    [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom, ContentType = WindowsRuntime] | Out-Null
+    [{toast_mgr}, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
+    [{xml_dom}.XmlDocument, {xml_dom}, ContentType = WindowsRuntime] | Out-Null
 
     $template = @"
     <toast>
@@ -229,20 +199,15 @@ def _send_windows_notification(title, message):
     </toast>
 "@
 
-    $xml = New-Object Windows.Data.Xml.Dom.XmlDocument
+    $xml = New-Object {xml_dom}.XmlDocument
     $xml.LoadXml($template)
     $toast = New-Object Windows.UI.Notifications.ToastNotification $xml
-    [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("Claude Task Notifier").Show($toast)
-    '''
+    [{toast_mgr}]::CreateToastNotifier("Claude Task Notifier").Show($toast)
+    """
 
     try:
-        subprocess.run(
-            ["powershell", "-NoProfile", "-Command", ps_script],
-            check=True,
-            capture_output=True,
-            timeout=10
-        )
-        print(f"[OK]    System notification sent (Windows)")
+        subprocess.run(["powershell", "-NoProfile", "-Command", ps_script], check=True, capture_output=True, timeout=10)
+        print("[OK]    System notification sent (Windows)")
         return True
     except subprocess.CalledProcessError as e:
         print(f"[WARN]  Windows notification failed: {e.stderr.decode().strip()}", file=sys.stderr)
@@ -255,6 +220,7 @@ def _send_windows_notification(title, message):
 # =============================================================================
 # Sound Notification
 # =============================================================================
+
 
 def play_sound(level):
     """Play sound based on notification level and OS."""
@@ -281,12 +247,7 @@ def _play_macos_sound(level):
         return False
 
     try:
-        subprocess.run(
-            ["afplay", sound_path],
-            check=True,
-            capture_output=True,
-            timeout=5
-        )
+        subprocess.run(["afplay", sound_path], check=True, capture_output=True, timeout=5)
         print(f"[OK]    Sound played: {sound_name}")
         return True
     except subprocess.CalledProcessError:
@@ -306,7 +267,7 @@ def _play_linux_sound(level):
     sound_files = [
         "/usr/share/sounds/freedesktop/stereo/complete.oga",
         "/usr/share/sounds/freedesktop/stereo/message.oga",
-        "/usr/share/sounds/freedesktop/stereo/dialog-information.oga"
+        "/usr/share/sounds/freedesktop/stereo/dialog-information.oga",
     ]
 
     for cmd in commands:
@@ -314,12 +275,7 @@ def _play_linux_sound(level):
             if not os.path.exists(sound_file):
                 continue
             try:
-                subprocess.run(
-                    [cmd, sound_file],
-                    check=True,
-                    capture_output=True,
-                    timeout=5
-                )
+                subprocess.run([cmd, sound_file], check=True, capture_output=True, timeout=5)
                 print(f"[OK]    Sound played: {os.path.basename(sound_file)}")
                 return True
             except (subprocess.CalledProcessError, FileNotFoundError):
@@ -331,29 +287,20 @@ def _play_linux_sound(level):
 
 def _play_windows_sound(level):
     """Play sound on Windows using PowerShell."""
-    sound_map = {
-        "success": "System.Asterisk",
-        "error": "System.Hand",
-        "info": "System.Default"
-    }
+    sound_map = {"success": "System.Asterisk", "error": "System.Hand", "info": "System.Default"}
     sound_name = sound_map.get(level, "System.Default")
 
-    ps_script = f'''
+    ps_script = f"""
     $sound = New-Object System.Media.SystemSound::{sound_name}
     $sound.Play()
-    '''
+    """
 
     try:
-        subprocess.run(
-            ["powershell", "-NoProfile", "-Command", ps_script],
-            check=True,
-            capture_output=True,
-            timeout=5
-        )
+        subprocess.run(["powershell", "-NoProfile", "-Command", ps_script], check=True, capture_output=True, timeout=5)
         print(f"[OK]    Sound played: {sound_name}")
         return True
     except subprocess.CalledProcessError:
-        print(f"[WARN]  Failed to play Windows sound", file=sys.stderr)
+        print("[WARN]  Failed to play Windows sound", file=sys.stderr)
         return False
     except Exception as e:
         print(f"[WARN]  Windows sound error: {e}", file=sys.stderr)
@@ -364,6 +311,7 @@ def _play_windows_sound(level):
 # Main Entry
 # =============================================================================
 
+
 def main():
     """Main entry point."""
     if len(sys.argv) != 3:
@@ -373,9 +321,9 @@ def main():
         print("  message: Notification message (use quotes for spaces)", file=sys.stderr)
         print("", file=sys.stderr)
         print("Examples:", file=sys.stderr)
-        print(f"  python3 {os.path.basename(__file__)} success \"Build completed!\"", file=sys.stderr)
-        print(f"  python3 {os.path.basename(__file__)} error \"Tests failed!\"", file=sys.stderr)
-        print(f"  python3 {os.path.basename(__file__)} info \"Task in progress...\"", file=sys.stderr)
+        print(f'  python3 {os.path.basename(__file__)} success "Build completed!"', file=sys.stderr)
+        print(f'  python3 {os.path.basename(__file__)} error "Tests failed!"', file=sys.stderr)
+        print(f'  python3 {os.path.basename(__file__)} info "Task in progress..."', file=sys.stderr)
         sys.exit(1)
 
     level = sys.argv[1].lower()

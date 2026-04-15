@@ -1,0 +1,11 @@
+# Gitleaks configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "skill-task-notifier gitleaks config"
+
+[allowlist]
+  description = "Global allowlist"
+  paths = [
+    '''config\.example\.json''',
+    '''tests/.*''',
+  ]
