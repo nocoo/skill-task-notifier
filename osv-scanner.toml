@@ -1,0 +1,8 @@
+# OSV-Scanner configuration
+# https://google.github.io/osv-scanner/
+
+[[PackageSources]]
+  # This project uses zero external dependencies (stdlib only).
+  # This config is a placeholder for future dependency scanning.
+  type = "lockfile"
+  path = "requirements.txt"
